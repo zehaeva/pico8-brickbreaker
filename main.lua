@@ -121,7 +121,7 @@ function _update()
 	
     -- if the ball hits a block destroy it and reflect it
     for j, b in pairs(bricks) do
-      if collision(a, b) then
+      if collision_next_frame(a, b) then
         add(deletebricks, j)
         
         if pget(nfx, nfy) ~= 0 and (pget(nfx + 1, nfy) ~= 0 or pget(nfx - 1, nfy) ~= 0) then
