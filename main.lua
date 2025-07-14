@@ -11,6 +11,8 @@ function brick:new(o)
   self.__index = self
   self.x = x
   self.y = y
+  self.vx = 0
+  self.vy = 0
   self.width = 8
   self.height = 4
   self.sprite = sprite or 1
@@ -23,6 +25,8 @@ function paddle:new(o)
   self.__index = self
   self.x = x
   self.y = y
+  self.vx = 0
+  self.vy = 0
   self.width = 12
   self.height = 4
   self.sprite = sprite or 2
@@ -51,6 +55,18 @@ function collision(a, b)
     return false
   end
 end
+
+function collision_next_frame(a, b)
+  -- classic collision algo
+  if (a.x + a.vx) <= (b.x + b.width + b.vx) and (a.x + a.width + a.vx) >= (b.x  + b.vx) and (a.y + a.vy) <= (b.y + b.height + b.vy) and (a.y + a.height + a.vy) >= (b.y + b.vy) then
+    return true
+  else
+    return false
+  end
+end
+
+function bounce()
+end
   
 function _init()
   startx = 12
@@ -76,19 +92,58 @@ function _update()
   if btn(1) and paddle.x <= 120 then 
     paddle.x = paddle.x + 1 
   end
-  
-  for a in balls do
+
+  deleteballs  = {}
+  deletebricks = {}
+  for i, a in pairs(balls) do
+    -- check wall bounce
+    if (a.x + a.vx) <= 0 or (a.x + a.vx) >= 128 then
+      a.vx = a.vx * -1
+    end
+
+    -- remove balls that the paddle misses
+    if a.y + a.vy >= 128 then
+      add(deleteballs, i)
+    end
+    
+    nfx = (a.x + a.vx)
+    nfy = (a.y + a.vy)
+    
     -- if the ball hits a paddle send the ball back
-    if collision(paddle, a) then
-	  a.vx = a.vx * -1
-	  a.vy = 
-	end
+    if collision_next_frame(paddle, a) then
+      if pget(nfx, nfy) ~= 0 and (pget(nfx + 1, nfy) ~= 0 or pget(nfx - 1, nfy) ~= 0) then
+        a.vx = a.vx * -1
+      end
+      if pget(nfx, nfy) ~= 0 and (pget(nfx, nfy + 1) ~= 0 or pget(nfx, nfy  - 1) ~= 0) then
+        a.vy = a.vy * -1
+      end
+    end
 	
-	-- if the ball hits a block destroy it and reflect it
-	for b in all(bricks) do
-	  if collision(a, b) then
-	  end
-	end
+    -- if the ball hits a block destroy it and reflect it
+    for j, b in pairs(bricks) do
+      if collision(a, b) then
+        add(deletebricks, j)
+        
+        if pget(nfx, nfy) ~= 0 and (pget(nfx + 1, nfy) ~= 0 or pget(nfx - 1, nfy) ~= 0) then
+          a.vx = a.vx * -1
+        end
+        if pget(nfx, nfy) ~= 0 and (pget(nfx, nfy + 1) ~= 0 or pget(nfx, nfy  - 1) ~= 0) then
+          a.vy = a.vy * -1
+        end
+      end
+    end
+  end
+
+  for a in all(deleteballs) do
+    deli(balls, a)
+  end 
+  for a in all(deletebricks) do
+    deli(bricks, a)
+  end 
+
+  for a in all(balls) do
+    a.x += a.vx
+    a.y + a.ay
   end
 end
 
