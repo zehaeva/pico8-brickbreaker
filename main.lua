@@ -1,4 +1,6 @@
 
+game_state = 0
+
 bricks = { }
 brick  = { }
 paddle = { }
@@ -81,16 +83,25 @@ function _init()
   
   paddle = paddle:new{x = 58, y = 120, sprite = 2}
   
-  add(balls, ball:new{x = 63, y = 117})
+  add(balls, ball:new{x = 63, y = 117, vx = 0, vy = 0})
+  
+  game_state = 0
 end
 
 function _update()
   -- player inputs
   if btn(0) and paddle.x > 0 then 
-    paddle.x = paddle.x - 1 
+    paddle.x = paddle.x - 1  
   end
   if btn(1) and paddle.x <= 120 then 
     paddle.x = paddle.x + 1 
+  end
+  
+  if btn(4) and game_state == 0 then
+    game_state = 1
+    for a in all(balls) do
+	  a.vy = -1
+	end
   end
 
   deleteballs  = {}
@@ -143,7 +154,7 @@ function _update()
 
   for a in all(balls) do
     a.x += a.vx
-    a.y + a.ay
+    a.y += a.vy
   end
 end
 
