@@ -147,8 +147,8 @@ function _update()
 				add(deleteballs, i)
 			end
 			
-			nfx = (a.x + a.vx)
-			nfy = (a.y + a.vy)
+			nfx = flr((a.x + a.vx))
+			nfy = flr((a.y + a.vy))
 			
 			-- if the ball hits a paddle send the ball back
 			if collision_next_frame(paddle, a) then
@@ -168,22 +168,27 @@ function _update()
 					add(deletebricks, j)
 					
 					score += b.score
+					--printh(sqrt(nfx*nfx + nfy*nfy))
 					pxy = pget(nfx, nfy)
 					if (pxy ~= 0) then
-						if (pget(nfx + 1, nfy) ~= 0 or pget(nfx - 1, nfy) ~= 0) then
-							a.vy = a.vy * -1
-							printh("reflect y axis")
-						end
-						if (pget(nfx, nfy + 1) ~= 0 or pget(nfx, nfy - 1) ~= 0) then
+						printh("----------------")
+						if (pget((nfx + 1), nfy) ~= 0) and 
+						   (pget((nfx - 1), nfy) ~= 0) and 
+						   ((pget(nfx, (nfy + 1)) ~= 0) or (pget(nfx, (nfy - 1)) ~= 0)) then
 							a.vx = a.vx * -1
-							printh("reflect x axis")
+							--printh("reflect x axis")
 						end
+						if (pget(nfx, (nfy + 1)) ~= 0) and 
+						   (pget(nfx, (nfy - 1)) ~= 0) and
+						   ((pget((nfx + 1), nfy) ~= 0) or (pget((nfx - 1), nfy) ~= 0)) then
+							a.vy = a.vy * -1
+							--printh("reflect y axis")
+						end
+						
+					else
+						a.vx = a.vx * -1
+						a.vy = a.vy * -1
 					end
-					
-					printh("(b.x,b.y): ("..b.x..","..b.y..")")
-					printh("(b.w,b.h): ("..b.width..","..b.height..")")
-					printh("nfx: ("..nfx..','..nfy..')')
-					printh("pget: "..pxy)
 					break
 				end
 			end
